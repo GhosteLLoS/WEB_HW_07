@@ -38,24 +38,19 @@ def select_2(subject):
         print(f"Не вдалося знайти студента з найвищим середнім балом з предмета '{subject}'")
 
 
-def select_3(subject):
+def select_3(discipline_id):
     """Знайти середній бал у групах з певного предмета."""
 
-    average_grades = (
-        session.query(Group.name, func.avg(Grade.grade, 2))
-        .join(Student)
-        .join(Grade)
-        .join(Discipline)
-        .filter(Grade.discipline_id == Discipline.id)
+    result = session.query(Discipline.name, Group.name, func.avg(Grade.grade)) \
+        .select_from(Grade) \
+        .join(Student) \
+        .join(Discipline) \
+        .join(Group) \
+        .filter(Discipline.id == discipline_id) \
+        .group_by(Discipline.name, Group.name) \
         .all()
-    )
 
-    if average_grades:
-        print(f"Середній бал у групах з предмета '{subject}':")
-        for group_name, average_grade in average_grades:
-            print(f"{group_name}: {average_grade}:")
-    else:
-        print(f"Не вдалося знайти середній бал у групах з предмета '{subject}'")
+    return result
 
 
 def select_4():
@@ -209,7 +204,7 @@ def select_10(student_name, teacher_name):
 if __name__ == "__main__":
     # print(select_1())
     # print(select_2("Математика"))
-    # print(select_3())
+    # print(select_3(5))
     # print(select_4())
     # print(select_5("Bryan Sharp"))
     # print(select_6(group_name="GoIT12"))
